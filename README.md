@@ -27,7 +27,7 @@ OpenClaw Zero Token is a fork of [OpenClaw](https://github.com/openclaw/openclaw
 |----------|--------|--------|
 | DeepSeek | ✅ **Tested** | deepseek-chat, deepseek-reasoner |
 | Qwen (International) | ✅ **Tested** | Qwen 3.5 Plus, Qwen 3.5 Turbo |
-| Qwen (国内版) | ✅ **Tested** | Qwen 3.5 Plus, Qwen 3.5 Turbo |
+| Qwen (China) | ✅ **Tested** | Qwen 3.5 Plus, Qwen 3.5 Turbo |
 | Kimi | ✅ **Tested** | Moonshot v1 8K, 32K, 128K |
 | Claude Web | ✅ **Tested** | claude-sonnet-4-6, claude-opus-4-6, claude-haiku-4-6 |
 | Doubao (豆包) | ✅ **Tested** | doubao-seed-2.0, doubao-pro |
@@ -38,9 +38,9 @@ OpenClaw Zero Token is a fork of [OpenClaw](https://github.com/openclaw/openclaw
 | GLM Web (International) | ✅ **Tested** | GLM-4 Plus, GLM-4 Think |
 | Manus API | ✅ **Tested** | Manus 1.6, Manus 1.6 Lite (API key, free tier) |
 
-> **Qwen 国内 vs 海外区别：**
-> - **Qwen International** (chat.qwen.ai) — 面向全球用户，无需翻墙
-> - **Qwen 国内版** (qianwen.com) — 面向中国用户，速度更快，功能更全（支持深度搜索、代码助手、图片生成等）
+> **Qwen International vs China:**
+> - **Qwen International** (chat.qwen.ai) — For global users, no VPN required
+> - **Qwen China** (qianwen.com) — For China users, faster speed, more features (deep search, code assistant, image generation, etc.)
 
 > **Note:** All web-based providers use browser automation (Playwright) for authentication and API access. Platforms marked **Tested** have been verified to work.
 
@@ -82,6 +82,83 @@ npm install && npm run build && pnpm ui:build
 > - **Windows:** Use WSL2, then follow the Linux flow ([START_HERE.md](START_HERE.md), [INSTALLATION.md](INSTALLATION.md)). Install WSL2: `wsl --install`; guide: https://docs.microsoft.com/en-us/windows/wsl/install.
 
 See **START_HERE.md**, **INSTALLATION.md**, and **TEST_STEPS.md** for details.
+
+### Notes
+
+- **Session validity**: Sessions may expire periodically; re-login when needed
+- **Browser dependency**: Chrome must run in debug mode
+- **Compliance**: For personal learning and research only; use official APIs for commercial use
+
+---
+
+## Quick Start
+
+> **Platform support:**
+>
+> - 🍎 **macOS** / 🐧 **Linux**: Follow [START_HERE.md](START_HERE.md) for step-by-step flow; see [INSTALLATION.md](INSTALLATION.md) for detailed setup.
+> - 🪟 **Windows**: Use WSL2, then follow the Linux flow ([START_HERE.md](START_HERE.md), [INSTALLATION.md](INSTALLATION.md)). Install WSL2: `wsl --install`; guide: https://docs.microsoft.com/en-us/windows/wsl/install
+
+### Environment Requirements
+
+- Node.js >= 22.12.0
+- pnpm >= 9.0.0
+- Chrome browser
+- **OS**: macOS, Linux, or Windows (WSL2)
+
+### Script Overview
+
+| Script | Purpose | When to use |
+|--------|---------|-------------|
+| `start-chrome-debug.sh` | Launch Chrome in debug mode | Step 2: Opens browser on port 9222 for platform login and onboard connection |
+| `onboard.sh` | Auth configuration wizard | Steps 4–5: Select platform (deepseek-web, etc.), capture Cookie/Token |
+| `server.sh` | Manage Gateway service | Step 6 and daily: `start` / `stop` / `restart` / `status`, port 3001 |
+
+### Installation
+
+```bash
+# Clone repo
+git clone https://github.com/linuxhsj/openclaw-zero-token.git
+cd openclaw-zero-token
+
+# Install dependencies
+pnpm install
+```
+
+### Startup
+
+#### Step 1: Build
+
+```bash
+pnpm build
+pnpm ui:build   # Build Web UI (required for http://127.0.0.1:3001)
+```
+
+#### Step 2: Configure Auth
+
+```bash
+# Copy config (optional: onboard or server will copy from .openclaw-state.example if missing)
+# First run: copy .openclaw-state.example/openclaw.json to .openclaw-zero-state/openclaw.json
+
+# Run config wizard
+./onboard.sh
+
+# Or use built version
+node openclaw.mjs onboard
+
+# Select auth provider
+? Auth provider: DeepSeek (Browser Login)
+
+# Select login mode
+? DeepSeek Auth Mode:
+  > Automated Login (Recommended)  # Auto-capture credentials
+```
+
+#### Step 3: Start Gateway
+
+```bash
+# Use helper script (recommended)
+./server.sh
+```
 
 ---
 
@@ -244,6 +321,195 @@ openclaw-zero-token/
 
 ---
 
+## Usage
+
+### Web UI
+
+After running `./server.sh`, the Web UI starts automatically. Use AI models directly in the chat interface. You can also open the chat directly at `http://127.0.0.1:3001/chat?session=<session-id>`.
+
+#### Switching Models
+
+Use the `/model` command in the chat interface to switch AI models:
+
+```bash
+/model claude-web
+/model doubao-web
+/model deepseek-web
+
+# Or specify a concrete model
+/model claude-web/claude-sonnet-4-6
+/model doubao-web/doubao-seed-2.0
+/model deepseek-web/deepseek-chat
+```
+
+#### List Available Models
+
+Use `/models` to see all configured models:
+
+```bash
+/models
+```
+
+> **Rule:** Only platforms completed in `./onboard.sh` are written to `openclaw.json` and shown in `/models`.
+
+**Example output:**
+
+```
+Model                                      Input      Ctx      Local Auth  Tags
+doubao-web/doubao-seed-2.0                 text       63k      no    no    default,configured,alias:Doubao Browser
+claude-web/claude-sonnet-4-6               text+image 195k     no    no    configured,alias:Claude Web
+deepseek-web/deepseek-chat                 text       64k      no    no    configured
+```
+
+### API
+
+```bash
+curl http://127.0.0.1:3001/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_GATEWAY_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "deepseek-web/deepseek-chat",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+### CLI
+
+```bash
+node openclaw.mjs tui
+```
+
+---
+
+## Configuration
+
+### openclaw.json
+
+```json
+{
+  "auth": {
+    "profiles": {
+      "deepseek-web:default": {
+        "provider": "deepseek-web",
+        "mode": "api_key"
+      }
+    }
+  },
+  "models": {
+    "providers": {
+      "deepseek-web": {
+        "baseUrl": "https://chat.deepseek.com",
+        "api": "deepseek-web",
+        "models": [
+          {
+            "id": "deepseek-chat",
+            "name": "DeepSeek Chat",
+            "contextWindow": 64000,
+            "maxTokens": 4096
+          },
+          {
+            "id": "deepseek-reasoner",
+            "name": "DeepSeek Reasoner",
+            "reasoning": true,
+            "contextWindow": 64000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "gateway": {
+    "port": 3001,
+    "auth": {
+      "mode": "token",
+      "token": "your-gateway-token"
+    }
+  }
+}
+```
+
+---
+
+## Troubleshooting
+
+### First Run: Use Config Wizard (Recommended)
+
+```bash
+./onboard.sh
+```
+
+The wizard creates all required files and directories.
+
+### Fix Issues: Use Doctor Command
+
+If the project has run before but you hit missing directories or files:
+
+```bash
+node dist/index.mjs doctor
+```
+
+The doctor command will:
+
+- ✅ Check required directories
+- ✅ Create missing directories
+- ✅ Fix file permissions
+- ✅ Validate config integrity
+- ✅ Detect state directory conflicts
+- ✅ Provide repair suggestions
+
+**Limitations:**
+
+- ❌ `doctor` does **not** create `openclaw.json`
+- ❌ `doctor` does **not** create `auth-profiles.json`
+- ✅ If config is missing or broken, run `./onboard.sh` again
+
+**When to use:** Directory deleted, permission errors, environment check, session history lost. **Not for first run** — use `onboard.sh` instead.
+
+---
+
+## Security
+
+1. **Credentials**: Cookies and Bearer tokens are stored locally in `auth.json` — **never commit to Git**
+2. **Session expiry**: Web sessions may expire; re-login when needed
+3. **Rate limits**: Web APIs may have rate limits; not suitable for high-frequency calls
+4. **Compliance**: For personal learning and research only; follow platform ToS
+
+---
+
+## Upstream Sync
+
+This project is based on [OpenClaw](https://github.com/openclaw/openclaw). To sync upstream:
+
+```bash
+git remote add upstream https://github.com/openclaw/openclaw.git
+git fetch upstream
+git merge upstream/main
+```
+
+---
+
+## Contributing
+
+Contributions are welcome, especially:
+
+- Bug fixes
+- Documentation improvements
+
+---
+
 ## License
 
 [MIT License](LICENSE)
+
+---
+
+## Acknowledgments
+
+- [OpenClaw](https://github.com/openclaw/openclaw) — Original project
+- [DeepSeek](https://deepseek.com) — Excellent AI models
+
+---
+
+## Disclaimer
+
+This project is for learning and research only. When using it to access third-party services, ensure you comply with their terms of service. The developers are not responsible for any issues arising from use of this project.
