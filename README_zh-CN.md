@@ -30,7 +30,7 @@ OpenClaw Zero Token 是 [OpenClaw](https://github.com/openclaw/openclaw) 的分�
 | -------------------------- | --------- | ---------------------------------------------------- |
 | DeepSeek                   | ✅ **已测试** | deepseek-chat, deepseek-reasoner                     |
 | 千问国际版 (Qwen International) | ✅ **已测试** | Qwen 3.5 Plus, Qwen 3.5 Turbo                        |
-| 千问国内版 (Qwen 国内版)           | ✅ **新增**  | Qwen 3.5 Plus, Qwen 3.5 Turbo                        |
+| 千问国内版 (Qwen 国内版)           | ✅ **已测试**  | Qwen 3.5 Plus, Qwen 3.5 Turbo                        |
 | Kimi                       | ✅ **已测试** | Moonshot v1 8K, 32K, 128K                            |
 | Claude Web                 | ✅ **已测试** | claude-sonnet-4-6, claude-opus-4-6, claude-haiku-4-6 |
 | 豆包 (Doubao)                | ✅ **已测试** | doubao-seed-2.0, doubao-pro                          |
@@ -38,7 +38,7 @@ OpenClaw Zero Token 是 [OpenClaw](https://github.com/openclaw/openclaw) 的分�
 | Gemini Web                 | ✅ **已测试** | Gemini Pro, Gemini Ultra                             |
 | Grok Web                   | ✅ **已测试** | Grok 1, Grok 2                                       |
 | GLM Web (智谱清言)             | ✅ **已测试** | glm-4-Plus, glm-4-Think                              |
-| GLM Web (国际版)              | ✅ **新增**  | GLM-4 Plus, GLM-4 Think                              |
+| GLM Web (国际版)              | ✅ **已测试**  | GLM-4 Plus, GLM-4 Think                              |
 | Manus API                  | ✅ **已测试** | Manus 1.6, Manus 1.6 Lite（API key，免费额度）              |
 
 
