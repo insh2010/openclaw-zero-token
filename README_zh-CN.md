@@ -247,10 +247,14 @@ pnpm ui:build
 
 首次运行可复制 .openclaw-state.example/openclaw.json 到 .openclaw-zero-state/openclaw.json
 
+# 启动浏览器调式模式
+./start-chrome-debug.sh
+
+# 登录各模型网页
+以deepseek为例,登录https://chat.deepseek.com/
 
 # 运行配置向导
 ./onboard.sh
-
 # 或使用编译后的版本
 node openclaw.mjs onboard
 

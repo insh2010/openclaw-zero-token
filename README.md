@@ -8,6 +8,27 @@
 
 ---
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Quick Start](#quick-start)
+- [System Architecture](#system-architecture)
+- [How It Works](#how-it-works)
+- [Roadmap](#roadmap)
+- [Adding New Platforms](#adding-new-platforms)
+- [File Structure](#file-structure)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
+- [Security](#security)
+- [Upstream Sync](#upstream-sync)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+- [Disclaimer](#disclaimer)
+
+---
+
 ## Overview
 
 OpenClaw Zero Token is a fork of [OpenClaw](https://github.com/openclaw/openclaw) with a core mission: **eliminate API token costs** by capturing session credentials through browser automation, enabling free access to major AI platforms.
@@ -67,7 +88,7 @@ The agent’s file access is limited to the configured **workspace** directory (
 
 ```bash
 # 1. Build
-npm install && npm run build && pnpm ui:build
+pnpm install && pnpm build && pnpm ui:build
 
 # 2. Open browser debug
 ./start-chrome-debug.sh
@@ -122,11 +143,12 @@ The project provides several helper scripts for different scenarios:
 │                                                                      │
 │  First-time setup:                                                   │
 │  ┌──────────────────────────────────────────────────────────────┐  │
-│  │ 1. Build              npm install && npm run build && pnpm ui:build │  │
+│  │ 1. Build              pnpm install && pnpm build && pnpm ui:build │  │
 │  │ 2. Open browser debug  ./start-chrome-debug.sh               │  │
-│  │ 3. Login to platforms  Qwen, Kimi, Claude, etc.              │  │
+│  │ 3. Login to platforms  Qwen, Kimi, Claude, etc. (excl. DeepSeek) │  │
 │  │ 4. Configure onboard   ./onboard.sh                          │  │
-│  │ 5. Start server        ./server.sh start                     │  │
+│  │ 5. Login DeepSeek      Chrome + onboard select deepseek-web  │  │
+│  │ 6. Start server        ./server.sh start                     │  │
 │  └──────────────────────────────────────────────────────────────┘  │
 │                                                                      │
 │  Daily use:                                                          │
@@ -169,10 +191,11 @@ pnpm ui:build   # Build Web UI (required for http://127.0.0.1:3001)
 #### Step 2: Configure Auth
 
 ```bash
-# Copy config (optional: onboard or server will copy from .openclaw-state.example if missing)
-# First run: copy .openclaw-state.example/openclaw.json to .openclaw-zero-state/openclaw.json
+# First: launch Chrome debug mode and login to platforms in the browser
+./start-chrome-debug.sh
+# Then visit and login: Qwen, Kimi, Claude, Doubao, ChatGPT, Gemini, Grok, GLM, etc.
 
-# Run config wizard
+# Run config wizard (onboard or server will copy from .openclaw-state.example if config is missing)
 ./onboard.sh
 
 # Or use built version
@@ -192,7 +215,7 @@ node openclaw.mjs onboard
 
 ```bash
 # Use helper script (recommended)
-./server.sh
+./server.sh start
 ```
 
 ---
@@ -363,7 +386,7 @@ openclaw-zero-token/
 
 ### Web UI
 
-After running `./server.sh`, the Web UI starts automatically. Use AI models directly in the chat interface. You can also open the chat directly at `http://127.0.0.1:3001/chat?session=<session-id>`.
+After running `./server.sh start`, the Web UI starts automatically. Use AI models directly in the chat interface. You can also open the chat directly at `http://127.0.0.1:3001/chat?session=<session-id>`.
 
 #### Switching Models
 
